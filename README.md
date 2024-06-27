@@ -11,7 +11,8 @@ project_root/
 │ ├── init.py
 │ ├── base_page.py
 │ ├── login_page.py
-│ ├── register_page.py
+│ ├── books_store_page.py
+| ├── profile_page.py
 │ └── books_page.py
 ├── tests/
 │ ├── init.py

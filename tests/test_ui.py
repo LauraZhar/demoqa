@@ -7,19 +7,12 @@ from pages.profile_page import ProfilePage
 from pages.book_store_page import BookStorePage  
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-USER_DATA = {
-  "userID": "3a5835e1-08eb-4c99-90aa-d2cc0c0089ea",
-  "username": "TestUser123",
-  "password": "qweQWE123!@#",
-  "books": []
-}
-
+from config import USER_DATA
 
 
 @allure.feature('Login')
 @allure.story('User Login')
 def test_login_user(browser):
-    global USER_DATA
     login_page = LoginPage(browser)
     login_page.open_login_page()
     with allure.step("Login existing user"):

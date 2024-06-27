@@ -1,0 +1,13 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Allure reports
+allure-report/
+allure-results/
+
+# Other caches and environment
+.env
+.vscode/
+.idea/

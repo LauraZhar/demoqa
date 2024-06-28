@@ -1,6 +1,4 @@
-#Из за капчи приходится данные хранить в конфиге, обойти ее не получается через UI, регистрация не работает из за этого 
 USER_DATA = {
-    "username": "TestUser123",
-    "password": "qweQWE123!@#",
-    "books": []
+    "userName": "TestUser",
+    "password": "Test@1234"
 }

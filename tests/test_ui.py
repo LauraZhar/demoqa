@@ -14,25 +14,38 @@ from config import USER_DATA
 @allure.story('User Login')
 def test_login_user(browser, register_user):
     login_page = LoginPage(browser)
-    login_page.open_login_page()
+    login_page.open_login_page()   
+    
+     # Прокрутка страницы вниз
+    with allure.step("Scroll down to avoid ads"):
+        browser.execute_script("window.scrollTo(200, document.body.scrollHeight);")
+
     with allure.step("Login existing user"):
         login_page.login(register_user["username"], register_user["password"])
+    
+
+    
     with allure.step("Verify login success"):
-        welcome_message = WebDriverWait(browser, 10).until(
+        welcome_message_element = WebDriverWait(browser, 10).until(
             EC.visibility_of_element_located((By.ID, "userName-value"))
-        ).text
-        assert register_user["username"] in welcome_message
+        )
+        assert register_user["username"] in welcome_message_element.text
 
 @allure.feature('Books')
 @allure.story('Search Book')
 def test_search_book(browser, register_user):
     login_page = LoginPage(browser)
     login_page.open_login_page()
+# Прокрутка страницы вниз
+    with allure.step("Scroll down to avoid ads"):
+        browser.execute_script("window.scrollTo(200, document.body.scrollHeight);")
+
     login_page.login(register_user["username"], register_user["password"])
     
     books_page = BooksPage(browser)
     books_page.open_books_page()
-    
+
+
     with allure.step("Search for a book"):
         books_page.search_book("Git Pocket Guide")
     
@@ -48,6 +61,11 @@ def test_search_book(browser, register_user):
 def test_go_to_book_store(browser, register_user):
     login_page = LoginPage(browser)
     login_page.open_login_page()
+
+    # Прокрутка страницы вниз
+    with allure.step("Scroll down to avoid ads"):
+        browser.execute_script("window.scrollTo(200, document.body.scrollHeight);")
+
     login_page.login(register_user["username"], register_user["password"])
     
     # Добавляем ожидание успешного входа
@@ -81,6 +99,10 @@ from selenium.webdriver.support import expected_conditions as EC
 def test_filter_books(browser, register_user):
     login_page = LoginPage(browser)
     login_page.open_login_page()
+# Прокрутка страницы вниз
+    with allure.step("Scroll down to avoid ads"):
+        browser.execute_script("window.scrollTo(200, document.body.scrollHeight);")
+
     login_page.login(register_user["username"], register_user["password"])
     
     books_page = BooksPage(browser)
@@ -98,6 +120,10 @@ def test_filter_books(browser, register_user):
 def test_logout_from_book_store(browser, register_user):
     login_page = LoginPage(browser)
     login_page.open_login_page()
+    # Прокрутка страницы вниз
+    with allure.step("Scroll down to avoid ads"):
+        browser.execute_script("window.scrollTo(200, document.body.scrollHeight);")
+        
     login_page.login(register_user["username"], register_user["password"])
     
     # Добавляем ожидание успешного входа

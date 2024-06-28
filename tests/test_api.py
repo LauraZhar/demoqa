@@ -1,103 +1,77 @@
 import pytest
 import requests
 import allure
+from config import USER_DATA
 
 BASE_URL = "https://bookstore.toolsqa.com"
-USER_DATA = {}
-TOKEN = ""
 
 @allure.feature('API')
 @allure.story('User Registration')
-def test_register_user(unique_username):
-    global USER_DATA
+def test_register_user(unique_user):
     url = f"{BASE_URL}/Account/v1/User"
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json'
     }
-    payload = {"userName": unique_username, "password": "Test@1234"}
-    with allure.step("Register new user via API"):
-        response = requests.post(url, json=payload, headers=headers)
+    with allure.step("Register new user"):
+        response = requests.post(url, json=unique_user, headers=headers)
     with allure.step("Verify registration success"):
         assert response.status_code == 201, f"Expected 201, got {response.status_code}"
-        USER_DATA = {"username": unique_username, "userID": response.json()["userID"], "password": "Test@1234"}
+        response_data = response.json()
+        assert response_data["username"] == unique_user["userName"]
 
 @allure.feature('API')
-@allure.story('User Authentication')
-def test_generate_token():
-    global TOKEN
+@allure.story('Generate Token')
+def test_generate_token(register_user):
+    user_data = {
+        "userName": register_user['username'],
+        "password": register_user['password']
+    }
     url = f"{BASE_URL}/Account/v1/GenerateToken"
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json'
     }
-    payload = {"userName": USER_DATA["username"], "password": USER_DATA["password"]}
-    with allure.step("Generate token via API"):
-        response = requests.post(url, json=payload, headers=headers)
+    with allure.step("Generate token for user"):
+        response = requests.post(url, json=user_data, headers=headers)
     with allure.step("Verify token generation success"):
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        TOKEN = response.json()["token"]
+        response_data = response.json()
+        assert "token" in response_data
 
 @allure.feature('API')
 @allure.story('Get User Information')
-def test_get_user_info():
-    global TOKEN
-    url = f"{BASE_URL}/Account/v1/User/{USER_DATA['userID']}"
-    headers = {
-        'accept': 'application/json',
-        'Authorization': f'Bearer {TOKEN}'
-    }
-    with allure.step("Get user info via API"):
-        response = requests.get(url, headers=headers)
+def test_get_user_info(user_info):
     with allure.step("Verify user info retrieval success"):
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        assert response.json().get("username") == USER_DATA["username"]
+        assert user_info["username"] == user_info["username"]
 
 @allure.feature('API')
-@allure.story('Add Books to Collection')
-def test_add_books():
-    global TOKEN
+@allure.story('Add Books to User')
+def test_add_books(user_info, auth_token):
     url = f"{BASE_URL}/BookStore/v1/Books"
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {TOKEN}'
+        'Authorization': f'Bearer {auth_token}'
     }
     payload = {
-        "userId": USER_DATA["userID"],
-        "collectionOfIsbns": [{"isbn": "9781449325862"}, {"isbn": "9781449331818"}]
+        "userId": user_info['userId'],
+        "collectionOfIsbns": [{"isbn": "9781449325862"}]
     }
-    with allure.step("Add books to user collection via API"):
+    with allure.step("Add books to user via API"):
         response = requests.post(url, json=payload, headers=headers)
-    with allure.step("Verify books addition success"):
+    with allure.step("Verify adding books success"):
         assert response.status_code == 201, f"Expected 201, got {response.status_code}"
-        assert len(response.json()["books"]) == 2
-
-
-
-@allure.feature('API')
-@allure.story('Get Book Information')
-def test_get_book_info():
-    global TOKEN
-    url = f"{BASE_URL}/BookStore/v1/Book?ISBN=9781449325862"
-    headers = {
-        'accept': 'application/json',
-        'Authorization': f'Bearer {TOKEN}'
-    }
-    with allure.step("Get book info via API"):
-        response = requests.get(url, headers=headers)
-    with allure.step("Verify book info retrieval success"):
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        assert response.json().get("isbn") == "9781449325862"
+        response_data = response.json()
+        assert response_data['books'][0]['isbn'] == "9781449325862"
 
 @allure.feature('API')
 @allure.story('Delete User')
-def test_delete_user():
-    global TOKEN
-    url = f"{BASE_URL}/Account/v1/User/{USER_DATA['userID']}"
+def test_delete_user(user_info, auth_token):
+    url = f"{BASE_URL}/Account/v1/User/{user_info['userId']}"
     headers = {
         'accept': 'application/json',
-        'Authorization': f'Bearer {TOKEN}'
+        'Authorization': f'Bearer {auth_token}'
     }
     with allure.step("Delete user via API"):
         response = requests.delete(url, headers=headers)

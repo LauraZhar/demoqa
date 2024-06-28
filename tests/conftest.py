@@ -2,6 +2,7 @@ import pytest
 import requests
 import time
 from config import USER_DATA
+from selenium import webdriver
 
 BASE_URL = "https://bookstore.toolsqa.com"
 
